@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PeerMarking - Sign Up</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#38e07b",
+                        "primary-dark": "#2ec266",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122017",
+                        "surface-dark": "#1A2C23", 
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", 
+                        "2xl": "3rem", 
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(0, 0, 0, 0.05)",
+                        "glow": "0 0 15px rgba(56, 224, 123, 0.2)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #29382f; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38e07b; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-body overflow-x-hidden selection:bg-primary selection:text-background-dark min-h-screen flex flex-col">
+<nav class="w-full max-w-[1200px] mx-auto px-6 md:px-10 py-6 flex items-center justify-between z-20">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-xl">
+<span class="material-symbols-outlined text-primary text-3xl">school</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">PeerMarking</h1>
+</div>
+<div>
+<span class="text-slate-500 dark:text-slate-400 text-sm mr-2">Already have an account?</span>
+<a class="text-sm font-bold text-slate-900 dark:text-white hover:text-primary transition-colors" href="#">Log In</a>
+</div>
+</nav>
+<main class="flex-1 flex flex-col items-center justify-center p-6 md:p-10 relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="z-10 w-full max-w-[1000px] flex flex-col items-center gap-8 md:gap-12">
+<div class="text-center space-y-3 max-w-2xl">
+<h2 class="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">Join the Community</h2>
+<p class="text-slate-500 dark:text-[#9eb7a8] text-lg">Select your role to get started with PeerMarking.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+<div class="group relative bg-white dark:bg-surface-dark rounded-2xl p-8 border border-slate-100 dark:border-white/5 hover:border-primary/50 dark:hover:border-primary/50 transition-all duration-300 shadow-sm dark:shadow-none hover:shadow-glow flex flex-col h-full">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-3xl text-blue-500">menu_book</span>
+</div>
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">ACCA Student</h3>
+<p class="text-slate-500 dark:text-[#9eb7a8] mb-8 text-sm leading-relaxed">
+                        I am studying for my ACCA exams. I want to submit practice answers, receive feedback, and improve my pass rates.
+                    </p>
+<div class="space-y-3 mb-8 flex-grow">
+<div class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+<span>Upload practice answers for review</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+<span>Get detailed marking from seniors</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+<span>Track progress dashboard</span>
+</div>
+</div>
+<button class="w-full py-4 px-6 rounded-xl bg-slate-100 dark:bg-white/5 border border-transparent hover:border-primary/50 hover:bg-white dark:hover:bg-surface-dark text-slate-900 dark:text-white font-bold transition-all duration-200 flex items-center justify-center gap-2 group/btn">
+                        Sign up as Student
+                        <span class="material-symbols-outlined text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="group relative bg-white dark:bg-surface-dark rounded-2xl p-8 border border-slate-100 dark:border-white/5 hover:border-primary/50 dark:hover:border-primary/50 transition-all duration-300 shadow-sm dark:shadow-none hover:shadow-glow flex flex-col h-full transform md:scale-105 md:-translate-y-2 z-10 ring-1 ring-primary/20">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute -top-3 -right-3 bg-primary text-background-dark text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-3">POPULAR</div>
+<div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-3xl text-primary">history_edu</span>
+</div>
+<h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">ACCA Senior (Marker)</h3>
+<p class="text-slate-500 dark:text-[#9eb7a8] mb-8 text-sm leading-relaxed">
+                        I have passed my papers. I want to review junior students' work, provide guidance, and build my professional reputation.
+                    </p>
+<div class="space-y-3 mb-8 flex-grow">
+<div class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+<span>Mark papers and give feedback</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+<span>Earn badges and reputation points</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-lg shrink-0">check_circle</span>
+<span>Mentor the next generation</span>
+</div>
+</div>
+<button class="w-full py-4 px-6 rounded-xl bg-primary hover:bg-primary-dark text-background-dark font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-glow hover:shadow-primary/40 group/btn">
+                        Sign up as Senior
+                        <span class="material-symbols-outlined text-lg group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<footer class="text-center mt-4">
+<p class="text-xs text-slate-400 dark:text-slate-500">
+                    By joining, you agree to our <a class="underline hover:text-primary" href="#">Terms of Service</a> and <a class="underline hover:text-primary" href="#">Privacy Policy</a>.
+                </p>
+</footer>
+</div>
+</main>
+
+</body></html>
