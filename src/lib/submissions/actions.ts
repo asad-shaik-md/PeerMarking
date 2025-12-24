@@ -57,7 +57,6 @@ export async function createSubmission(formData: FormData) {
     });
 
   if (uploadError) {
-    console.error("Upload error:", uploadError);
     return { error: "Failed to upload file. Please try again." };
   }
 
@@ -79,7 +78,6 @@ export async function createSubmission(formData: FormData) {
     .single();
 
   if (dbError) {
-    console.error("Database error:", dbError);
     // Clean up uploaded file if DB insert fails
     await supabase.storage.from("submissions").remove([fileName]);
     return { error: "Failed to create submission. Please try again." };
@@ -109,7 +107,6 @@ export async function getMySubmissions(): Promise<Submission[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching submissions:", error);
     return [];
   }
 
@@ -136,7 +133,6 @@ export async function getSubmission(id: string): Promise<Submission | null> {
     .single();
 
   if (error) {
-    console.error("Error fetching submission:", error);
     return null;
   }
 
@@ -200,16 +196,16 @@ export async function getRecentSubmissions(): Promise<Submission[]> {
     .limit(5);
 
   if (error) {
-    console.error("Error fetching recent submissions:", error);
     return [];
   }
 
   return data as Submission[];
 }
 
-// Get signed URL for file download
+// Get signed URL for file download (students only - verifies ownership)
 export async function getFileDownloadUrl(
-  filePath: string
+  filePath: string,
+  submissionId: string
 ): Promise<{ url: string | null; error: string | null }> {
   const supabase = await createClient();
 
@@ -221,14 +217,28 @@ export async function getFileDownloadUrl(
     return { url: null, error: "Not authenticated" };
   }
 
-  // Verify the file belongs to the user by checking if path starts with user ID
-  // or by checking the submission record
+  // Verify the user owns this submission
+  const { data: submission, error: fetchError } = await supabase
+    .from("submissions")
+    .select("id, user_id, file_path, marked_file_path")
+    .eq("id", submissionId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (fetchError || !submission) {
+    return { url: null, error: "You do not have permission to download this file" };
+  }
+
+  // Verify the file path matches the submission
+  if (filePath !== submission.file_path && filePath !== submission.marked_file_path) {
+    return { url: null, error: "Invalid file path" };
+  }
+
   const { data, error } = await supabase.storage
     .from("submissions")
     .createSignedUrl(filePath, 60 * 5); // 5 minutes expiry
 
   if (error) {
-    console.error("Error creating signed URL:", error);
     return { url: null, error: "Failed to generate download link" };
   }
 

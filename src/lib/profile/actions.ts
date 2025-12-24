@@ -49,7 +49,6 @@ export async function getStudentProfile(): Promise<StudentProfileData | null> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching submissions:", error);
     return null;
   }
 
@@ -100,7 +99,6 @@ export async function getMarkerProfile(): Promise<MarkerProfileData | null> {
     .order("reviewed_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching reviews:", error);
     return null;
   }
 
@@ -159,7 +157,6 @@ export async function getMarkerPublicProfile(markerId: string): Promise<MarkerPr
     .order("reviewed_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching marker reviews:", error);
     return null;
   }
 
@@ -231,7 +228,6 @@ export async function getCommunitySubmissions(): Promise<CommunitySubmission[]> 
     .limit(50);
 
   if (error) {
-    console.error("Error fetching community submissions:", error);
     return [];
   }
 
@@ -268,7 +264,6 @@ export async function getCommunitySubmissionDetail(id: string): Promise<Submissi
     .single();
 
   if (error) {
-    console.error("Error fetching submission:", error);
     return null;
   }
 

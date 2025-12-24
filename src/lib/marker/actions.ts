@@ -52,7 +52,6 @@ export async function getMyAssignedReviews(): Promise<Submission[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching assigned reviews:", error);
     return [];
   }
 
@@ -80,7 +79,6 @@ export async function getRecentAssignedReviews(): Promise<Submission[]> {
     .limit(5);
 
   if (error) {
-    console.error("Error fetching recent assigned reviews:", error);
     return [];
   }
 
@@ -110,7 +108,6 @@ export async function getPendingSubmissions(): Promise<Submission[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching pending submissions:", error);
     return [];
   }
 
@@ -159,7 +156,6 @@ export async function acceptReview(submissionId: string) {
     .eq("status", "pending"); // Double-check status to prevent race conditions
 
   if (updateError) {
-    console.error("Error accepting review:", updateError);
     return { error: "Failed to accept review. Please try again." };
   }
 
@@ -190,7 +186,6 @@ export async function getSubmissionForReview(id: string): Promise<Submission | n
     .single();
 
   if (error) {
-    console.error("Error fetching submission for review:", error);
     return null;
   }
 
@@ -229,6 +224,11 @@ export async function submitReview(formData: FormData) {
 
   if (fetchError || !submission) {
     return { error: "You do not have permission to review this submission" };
+  }
+
+  // STATUS GUARDRAIL: Prevent editing submissions that have already been reviewed
+  if (submission.status === "reviewed") {
+    return { error: "This submission has already been reviewed and cannot be edited" };
   }
 
   // If not a draft, require a marked file
@@ -276,7 +276,6 @@ export async function submitReview(formData: FormData) {
       });
 
     if (uploadError) {
-      console.error("Upload error:", uploadError);
       return { error: "Failed to upload marked file. Please try again." };
     }
 
@@ -317,7 +316,6 @@ export async function submitReview(formData: FormData) {
     .eq("marker_id", user.id);
 
   if (updateError) {
-    console.error("Error submitting review:", updateError);
     return { error: "Failed to submit review. Please try again." };
   }
 
@@ -335,9 +333,10 @@ export async function submitReview(formData: FormData) {
   return { success: true };
 }
 
-// Get signed URL for file download (for markers)
+// Get signed URL for file download (for markers - verifies assignment)
 export async function getMarkerFileDownloadUrl(
-  filePath: string
+  filePath: string,
+  submissionId: string
 ): Promise<{ url: string | null; error: string | null }> {
   const supabase = await createClient();
 
@@ -349,12 +348,28 @@ export async function getMarkerFileDownloadUrl(
     return { url: null, error: "Not authenticated" };
   }
 
+  // Verify the submission is assigned to this marker
+  const { data: submission, error: fetchError } = await supabase
+    .from("submissions")
+    .select("id, marker_id, file_path, marked_file_path")
+    .eq("id", submissionId)
+    .eq("marker_id", user.id)
+    .single();
+
+  if (fetchError || !submission) {
+    return { url: null, error: "You do not have permission to download this file" };
+  }
+
+  // Verify the file path matches the submission
+  if (filePath !== submission.file_path && filePath !== submission.marked_file_path) {
+    return { url: null, error: "Invalid file path" };
+  }
+
   const { data, error } = await supabase.storage
     .from("submissions")
     .createSignedUrl(filePath, 60 * 5); // 5 minutes expiry
 
   if (error) {
-    console.error("Error creating signed URL:", error);
     return { url: null, error: "Failed to generate download link" };
   }
 

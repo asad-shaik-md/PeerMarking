@@ -37,12 +37,20 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Define protected routes
-  const protectedRoutes = ["/student", "/marker"];
+  // Define route categories
+  const studentRoutes = ["/student"];
+  const markerRoutes = ["/marker"];
   const authRoutes = ["/login", "/signup", "/forgot-password"];
+  const sharedProtectedRoutes = ["/community", "/markers"];
 
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isStudentRoute = studentRoutes.some((route) => pathname.startsWith(route));
+  const isMarkerRoute = markerRoutes.some((route) => pathname.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isSharedProtectedRoute = sharedProtectedRoutes.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = isStudentRoute || isMarkerRoute || isSharedProtectedRoute;
+
+  // Get user role from user metadata
+  const role = user?.user_metadata?.role as string | undefined;
 
   // If user is not authenticated and trying to access protected routes
   if (!user && isProtectedRoute) {
@@ -53,16 +61,29 @@ export async function updateSession(request: NextRequest) {
 
   // If user is authenticated and trying to access auth routes, redirect to appropriate dashboard
   if (user && isAuthRoute) {
-    // Get user role from user metadata
-    const role = user.user_metadata?.role as string | undefined;
     const url = request.nextUrl.clone();
-
     if (role === "marker") {
       url.pathname = "/marker/dashboard";
     } else {
       url.pathname = "/student/dashboard";
     }
+    return NextResponse.redirect(url);
+  }
 
+  // ROLE-BASED ACCESS CONTROL
+  // Prevent students from accessing marker routes
+  if (user && isMarkerRoute && role !== "marker") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/student/dashboard";
+    url.searchParams.set("error", "unauthorized");
+    return NextResponse.redirect(url);
+  }
+
+  // Prevent markers from accessing student routes
+  if (user && isStudentRoute && role === "marker") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/marker/dashboard";
+    url.searchParams.set("error", "unauthorized");
     return NextResponse.redirect(url);
   }
 

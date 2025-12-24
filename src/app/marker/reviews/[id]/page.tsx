@@ -14,10 +14,10 @@ export default async function MarkerReviewDetailPage({
     notFound();
   }
 
-  // Get download URLs
-  const originalDownload = await getMarkerFileDownloadUrl(submission.file_path);
+  // Get download URLs with assignment verification
+  const originalDownload = await getMarkerFileDownloadUrl(submission.file_path, submission.id);
   const markedDownload = submission.marked_file_path
-    ? await getMarkerFileDownloadUrl(submission.marked_file_path)
+    ? await getMarkerFileDownloadUrl(submission.marked_file_path, submission.id)
     : null;
 
   return (

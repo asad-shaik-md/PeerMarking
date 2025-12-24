@@ -88,10 +88,10 @@ export default async function SubmissionDetailPage({
     notFound();
   }
 
-  // Get download URLs
-  const originalDownloadUrl = await getFileDownloadUrl(submission.file_path);
+  // Get download URLs with ownership verification
+  const originalDownloadUrl = await getFileDownloadUrl(submission.file_path, submission.id);
   const markedDownloadUrl = submission.marked_file_path
-    ? await getFileDownloadUrl(submission.marked_file_path)
+    ? await getFileDownloadUrl(submission.marked_file_path, submission.id)
     : null;
 
   return (
