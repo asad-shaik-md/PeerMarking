@@ -30,12 +30,12 @@ export default function LoginPage() {
       </div>
 
       {/* Logo */}
-      <div className="relative z-10 mb-8 flex items-center gap-3">
+      <Link href="/" className="relative z-10 mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="bg-primary/20 p-2.5 rounded-xl shadow-glow">
           <span className="material-symbols-outlined text-primary text-3xl">school</span>
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-white">PeerMarking</h1>
-      </div>
+      </Link>
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-[420px] bg-surface-dark rounded-2xl shadow-xl shadow-black/20 border border-white/5 overflow-hidden">

@@ -12,7 +12,7 @@ export async function signUp(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const role = formData.get("role") as UserRole;
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -25,6 +25,12 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Check if this is a fake signup (email already exists)
+  // Supabase returns a user with identities = [] when email already exists
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    return { error: "An account with this email already exists. Please log in instead." };
   }
 
   // Redirect based on role after signup
@@ -50,7 +56,7 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
-  // Get user role and redirect
+  // Get user role and redirect accordingly
   const role = data.user.user_metadata?.role as string | undefined;
 
   if (role === "marker") {
@@ -63,7 +69,7 @@ export async function signIn(formData: FormData) {
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/login");
+  redirect("/");
 }
 
 export async function forgotPassword(formData: FormData) {
