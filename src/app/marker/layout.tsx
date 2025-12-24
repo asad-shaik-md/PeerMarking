@@ -50,6 +50,12 @@ export default async function MarkerDashboardLayout({
               >
                 My Reviews
               </Link>
+              <Link
+                href="/community"
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              >
+                Community
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -59,10 +65,13 @@ export default async function MarkerDashboardLayout({
               </span>
               <span className="text-xs font-bold text-primary">SENIOR MARKER</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Link
+              href="/marker/profile"
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
               <span className="material-symbols-outlined text-[20px]">person</span>
               <span className="hidden sm:inline">{user.email}</span>
-            </div>
+            </Link>
             <form action={signOut}>
               <button
                 type="submit"

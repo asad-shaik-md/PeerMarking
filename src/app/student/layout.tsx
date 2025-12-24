@@ -50,13 +50,22 @@ export default async function StudentDashboardLayout({
               >
                 Upload Answer
               </Link>
+              <Link
+                href="/community"
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              >
+                Community
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Link
+              href="/student/profile"
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
               <span className="material-symbols-outlined text-[20px]">person</span>
               <span className="hidden sm:inline">{user.email}</span>
-            </div>
+            </Link>
             <form action={signOut}>
               <button
                 type="submit"
