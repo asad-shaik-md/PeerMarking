@@ -204,7 +204,6 @@ export interface CommunitySubmission {
   question?: string;
   status: string;
   reviewedAt: string;
-  score?: number;
 }
 
 export async function getCommunitySubmissions(): Promise<CommunitySubmission[]> {
@@ -222,7 +221,7 @@ export async function getCommunitySubmissions(): Promise<CommunitySubmission[]> 
   // Get only reviewed submissions
   const { data, error } = await supabase
     .from("submissions")
-    .select("id, paper, title, question, status, reviewed_at, score")
+    .select("id, paper, title, question, status, reviewed_at")
     .eq("status", "reviewed")
     .order("reviewed_at", { ascending: false })
     .limit(50);
@@ -238,7 +237,6 @@ export async function getCommunitySubmissions(): Promise<CommunitySubmission[]> 
     question: s.question,
     status: s.status,
     reviewedAt: s.reviewed_at,
-    score: s.score,
   }));
 }
 

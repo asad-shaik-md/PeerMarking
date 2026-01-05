@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUser, getUserRole, signOut } from "@/lib/auth/actions";
 import Link from "next/link";
+import MarkerNav from "./MarkerNav";
 
 export default async function MarkerDashboardLayout({
   children,
@@ -19,6 +20,8 @@ export default async function MarkerDashboardLayout({
     redirect("/student/dashboard");
   }
 
+  const userName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Marker";
+
   return (
     <div className="min-h-screen bg-background-dark">
       {/* Header */}
@@ -31,47 +34,13 @@ export default async function MarkerDashboardLayout({
               </div>
               <span className="text-lg font-bold tracking-tight text-white">PeerMarking</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link
-                href="/marker/dashboard"
-                className="text-sm font-medium text-white transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/marker/queue"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Review Queue
-              </Link>
-              <Link
-                href="/marker/reviews"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                My Reviews
-              </Link>
-              <Link
-                href="/community"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Community
-              </Link>
-            </nav>
+            <MarkerNav />
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-              <span className="material-symbols-outlined text-primary text-[16px]">
-                verified
-              </span>
-              <span className="text-xs font-bold text-primary">SENIOR MARKER</span>
-            </div>
-            <Link
-              href="/marker/profile"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
+            <div className="flex items-center gap-2 text-sm text-gray-400">
               <span className="material-symbols-outlined text-[20px]">person</span>
-              <span className="hidden sm:inline">{user.email}</span>
-            </Link>
+              <span className="hidden sm:inline">{userName}</span>
+            </div>
             <form action={signOut}>
               <button
                 type="submit"

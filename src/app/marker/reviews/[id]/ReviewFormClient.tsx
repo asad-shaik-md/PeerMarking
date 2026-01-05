@@ -52,7 +52,6 @@ export default function ReviewFormClient({
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [score, setScore] = useState<string>(submission.score?.toString() || "");
   const [markerNotes, setMarkerNotes] = useState<string>(submission.marker_notes || "");
 
   const isReviewed = submission.status === "reviewed";
@@ -119,7 +118,6 @@ export default function ReviewFormClient({
     const formData = new FormData();
     formData.set("submissionId", submission.id);
     formData.set("markerNotes", markerNotes);
-    formData.set("score", score);
     formData.set("isDraft", isDraft.toString());
 
     if (selectedFile) {
@@ -175,37 +173,6 @@ export default function ReviewFormClient({
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">calendar_today</span>
               <span>Submitted {formatDate(submission.created_at)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Score Input */}
-        <div className="flex-shrink-0">
-          <div className="bg-surface-dark border border-white/10 p-2 pr-6 rounded-2xl flex items-center gap-4">
-            <div className="size-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-300">
-              <span className="material-symbols-outlined">grade</span>
-            </div>
-            <div>
-              <label
-                className="block text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-0.5"
-                htmlFor="scoreInput"
-              >
-                Total Marks
-              </label>
-              <div className="flex items-baseline gap-1">
-                <input
-                  id="scoreInput"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={score}
-                  onChange={(e) => setScore(e.target.value)}
-                  disabled={isReviewed}
-                  className="w-16 p-0 text-3xl font-bold text-white bg-transparent border-none focus:ring-0 text-right placeholder-gray-500 disabled:opacity-50"
-                  placeholder="00"
-                />
-                <span className="text-xl font-medium text-gray-400">/ 100</span>
-              </div>
             </div>
           </div>
         </div>

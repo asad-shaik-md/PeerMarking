@@ -37,17 +37,18 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Pass pathname to server components via header for active state detection
+  supabaseResponse.headers.set("x-pathname", pathname);
+
   // Define route categories
   const studentRoutes = ["/student"];
   const markerRoutes = ["/marker"];
   const authRoutes = ["/login", "/signup", "/forgot-password"];
-  const sharedProtectedRoutes = ["/community", "/markers"];
 
   const isStudentRoute = studentRoutes.some((route) => pathname.startsWith(route));
   const isMarkerRoute = markerRoutes.some((route) => pathname.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-  const isSharedProtectedRoute = sharedProtectedRoutes.some((route) => pathname.startsWith(route));
-  const isProtectedRoute = isStudentRoute || isMarkerRoute || isSharedProtectedRoute;
+  const isProtectedRoute = isStudentRoute || isMarkerRoute;
 
   // Get user role from user metadata
   const role = user?.user_metadata?.role as string | undefined;

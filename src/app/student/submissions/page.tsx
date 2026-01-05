@@ -84,47 +84,6 @@ export default async function AllSubmissionsPage() {
         </Link>
       </header>
 
-      {/* Filters */}
-      <div className="bg-surface-dark p-2 rounded-2xl border border-white/5 flex flex-col md:flex-row items-center gap-2">
-        <div className="relative flex-1 w-full">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            search
-          </span>
-          <input
-            className="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-0"
-            placeholder="Search by paper or question..."
-            type="text"
-          />
-        </div>
-        <div className="w-px h-8 bg-white/10 hidden md:block" />
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <select className="flex-1 md:w-auto bg-white/5 border-none rounded-xl text-sm font-medium text-gray-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer">
-            <option>All Papers</option>
-            <option value="PM">PM</option>
-            <option value="FM">FM</option>
-            <option value="AA">AA</option>
-            <option value="TX">TX</option>
-            <option value="FR">FR</option>
-            <option value="SBL">SBL</option>
-            <option value="SBR">SBR</option>
-            <option value="APM">APM</option>
-            <option value="AFM">AFM</option>
-            <option value="ATX">ATX</option>
-            <option value="AAA">AAA</option>
-          </select>
-          <select className="flex-1 md:w-auto bg-white/5 border-none rounded-xl text-sm font-medium text-gray-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer">
-            <option>All Status</option>
-            <option value="reviewed">Reviewed</option>
-            <option value="under_review">Under Review</option>
-            <option value="pending">Pending</option>
-          </select>
-          <select className="flex-1 md:w-auto bg-white/5 border-none rounded-xl text-sm font-medium text-gray-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer">
-            <option>Newest First</option>
-            <option>Oldest First</option>
-          </select>
-        </div>
-      </div>
-
       {/* Empty State */}
       {submissions.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4 bg-surface-dark rounded-2xl border border-white/5">
@@ -150,10 +109,9 @@ export default async function AllSubmissionsPage() {
         <>
           {/* Table Header - Desktop */}
           <div className="hidden md:grid grid-cols-12 gap-4 px-6 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            <div className="col-span-5">Paper &amp; Question</div>
+            <div className="col-span-6">Paper &amp; Question</div>
             <div className="col-span-3">Submitted Date</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2 text-right">Action</div>
+            <div className="col-span-3">Status</div>
           </div>
 
           {/* Submissions */}
@@ -162,13 +120,14 @@ export default async function AllSubmissionsPage() {
               const paperColor = getPaperColor(submission.paper);
               
               return (
-                <div
+                <Link
                   key={submission.id}
-                  className="group relative bg-surface-dark rounded-xl p-4 md:px-6 md:py-5 border border-white/5 hover:border-primary/30 transition-all duration-200"
+                  href={`/student/submissions/${submission.id}`}
+                  className="group relative bg-surface-dark rounded-xl p-4 md:px-6 md:py-5 border border-white/5 hover:border-primary/30 transition-all duration-200 cursor-pointer block"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                     {/* Paper & Question */}
-                    <div className="md:col-span-5 flex items-center gap-4">
+                    <div className="md:col-span-6 flex items-center gap-4">
                       <div
                         className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 border"
                         style={{
@@ -180,7 +139,7 @@ export default async function AllSubmissionsPage() {
                         {submission.paper}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <h3 className="text-sm font-bold text-white truncate">
+                        <h3 className="text-sm font-bold text-white truncate group-hover:text-primary transition-colors">
                           {submission.title}
                         </h3>
                         <p className="text-xs text-gray-400 truncate">
@@ -204,26 +163,11 @@ export default async function AllSubmissionsPage() {
                     </div>
 
                     {/* Status */}
-                    <div className="md:col-span-2 flex items-center gap-2 md:gap-0">
+                    <div className="md:col-span-3 flex items-center gap-2 md:gap-0">
                       <span className="md:hidden text-xs font-medium text-gray-500 uppercase w-20">
                         Status:
                       </span>
                       {getStatusBadge(submission.status)}
-                    </div>
-
-                    {/* Action */}
-                    <div className="md:col-span-2 flex justify-end gap-2">
-                      <Link
-                        href={`/student/submissions/${submission.id}`}
-                        className="md:w-full bg-white/5 hover:bg-primary hover:text-background-dark text-gray-300 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-lg">
-                          {submission.status === "reviewed" ? "download" : "visibility"}
-                        </span>
-                        <span className="hidden lg:inline">
-                          {submission.status === "reviewed" ? "Feedback" : "View"}
-                        </span>
-                      </Link>
                     </div>
                   </div>
 
@@ -233,7 +177,7 @@ export default async function AllSubmissionsPage() {
                       submission.status
                     )}`}
                   />
-                </div>
+                </Link>
               );
             })}
           </div>

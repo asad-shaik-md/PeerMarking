@@ -71,34 +71,6 @@ export default async function CommunityPage() {
             </div>
           </header>
 
-          {/* Filters */}
-          <div className="bg-surface-dark p-2 rounded-[12px] border border-white/5 flex flex-col md:flex-row items-center gap-2">
-            <div className="relative flex-1 w-full">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                search
-              </span>
-              <input
-                className="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-sm text-white placeholder-slate-400 focus:ring-0 focus:outline-none"
-                placeholder="Search by paper or question..."
-                type="text"
-              />
-            </div>
-            <div className="w-px h-8 bg-white/10 hidden md:block"></div>
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <select className="flex-1 md:w-auto bg-white/5 border-none rounded-[10px] text-sm font-medium text-slate-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer">
-                <option>All Papers</option>
-                <option>PM</option>
-                <option>FM</option>
-                <option>AA</option>
-                <option>TX</option>
-              </select>
-              <select className="flex-1 md:w-auto bg-white/5 border-none rounded-[10px] text-sm font-medium text-slate-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer">
-                <option>Newest First</option>
-                <option>Oldest First</option>
-              </select>
-            </div>
-          </div>
-
           {/* Submissions Grid */}
           {submissions.length === 0 ? (
             <div className="text-center py-16">
@@ -176,29 +148,12 @@ export default async function CommunityPage() {
             </div>
           )}
 
-          {/* Pagination */}
+          {/* Results count */}
           {submissions.length > 0 && (
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm py-4">
               <p className="text-slate-400">
-                Showing 1 to {Math.min(submissions.length, 6)} of {submissions.length} results
+                Showing {submissions.length} reviewed submission{submissions.length !== 1 ? "s" : ""}
               </p>
-              <div className="flex items-center gap-2">
-                <button className="p-2 rounded-lg bg-white/5 text-slate-400 hover:bg-white/10 transition-colors disabled:opacity-50">
-                  <span className="material-symbols-outlined text-lg">chevron_left</span>
-                </button>
-                <button className="w-8 h-8 rounded-lg bg-primary text-background-dark font-bold text-sm">
-                  1
-                </button>
-                <button className="w-8 h-8 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 font-medium text-sm transition-colors">
-                  2
-                </button>
-                <button className="w-8 h-8 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 font-medium text-sm transition-colors">
-                  3
-                </button>
-                <button className="p-2 rounded-lg bg-white/5 text-slate-400 hover:bg-white/10 transition-colors">
-                  <span className="material-symbols-outlined text-lg">chevron_right</span>
-                </button>
-              </div>
             </div>
           )}
         </div>

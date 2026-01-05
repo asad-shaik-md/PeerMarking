@@ -159,41 +159,6 @@ export default function SubmissionsQueueClient({ submissions }: SubmissionsQueue
         </div>
       </header>
 
-      {/* Filters */}
-      <div className="bg-surface-dark p-2 rounded-2xl border border-white/5 flex flex-col md:flex-row items-center gap-2">
-        <div className="relative flex-1 w-full">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            search
-          </span>
-          <input
-            className="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-0"
-            placeholder="Search by paper, question or student ID..."
-            type="text"
-          />
-        </div>
-        <div className="w-px h-8 bg-white/10 hidden md:block" />
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-          <select className="flex-1 md:w-auto bg-white/5 border-none rounded-xl text-sm font-medium text-gray-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer min-w-[120px]">
-            <option>All Papers</option>
-            <option value="PM">PM (F5)</option>
-            <option value="FM">FM (F9)</option>
-            <option value="FR">FR (F7)</option>
-            <option value="AA">AA (F8)</option>
-            <option value="TX">TX (F6)</option>
-            <option value="SBL">SBL</option>
-            <option value="SBR">SBR</option>
-            <option value="AFM">AFM</option>
-            <option value="APM">APM</option>
-            <option value="ATX">ATX</option>
-            <option value="AAA">AAA</option>
-          </select>
-          <select className="flex-1 md:w-auto bg-white/5 border-none rounded-xl text-sm font-medium text-gray-300 py-2.5 pl-4 pr-8 focus:ring-2 focus:ring-primary/50 cursor-pointer min-w-[140px]">
-            <option>Most Recent</option>
-            <option>Oldest First</option>
-          </select>
-        </div>
-      </div>
-
       {/* Empty State */}
       {submissions.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4 bg-surface-dark rounded-2xl border border-white/5">

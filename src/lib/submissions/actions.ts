@@ -148,16 +148,16 @@ export async function getSubmissionStats() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { total: 0, pending: 0, underReview: 0, reviewed: 0, averageScore: null };
+    return { total: 0, pending: 0, underReview: 0, reviewed: 0 };
   }
 
   const { data, error } = await supabase
     .from("submissions")
-    .select("status, score")
+    .select("status")
     .eq("user_id", user.id);
 
   if (error || !data) {
-    return { total: 0, pending: 0, underReview: 0, reviewed: 0, averageScore: null };
+    return { total: 0, pending: 0, underReview: 0, reviewed: 0 };
   }
 
   const total = data.length;
@@ -165,15 +165,7 @@ export async function getSubmissionStats() {
   const underReview = data.filter((s) => s.status === "under_review").length;
   const reviewed = data.filter((s) => s.status === "reviewed").length;
 
-  const reviewedWithScores = data.filter((s) => s.status === "reviewed" && s.score !== null);
-  const averageScore =
-    reviewedWithScores.length > 0
-      ? Math.round(
-          reviewedWithScores.reduce((sum, s) => sum + (s.score || 0), 0) / reviewedWithScores.length
-        )
-      : null;
-
-  return { total, pending, underReview, reviewed, averageScore };
+  return { total, pending, underReview, reviewed };
 }
 
 // Get recent submissions (limit 5)

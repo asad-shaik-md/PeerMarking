@@ -75,7 +75,7 @@ export default async function StudentDashboard() {
       </header>
 
       {/* Stats Grid */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-surface-dark p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group border border-white/5">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span className="material-symbols-outlined text-4xl">inventory_2</span>
@@ -102,26 +102,6 @@ export default async function StudentDashboard() {
             <span className="material-symbols-outlined text-sm">schedule</span>
             <span>Awaiting feedback</span>
           </div>
-        </div>
-
-        <div className="bg-surface-dark p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group border border-white/5">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span className="material-symbols-outlined text-4xl">grade</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-text-muted text-sm font-medium">Average Score</p>
-            <p className="text-4xl font-bold text-white">
-              {stats.averageScore !== null ? `${stats.averageScore}%` : "—"}
-            </p>
-          </div>
-          {stats.averageScore !== null && (
-            <div className="w-full bg-white/10 rounded-full h-1.5 mt-auto">
-              <div
-                className="bg-primary h-1.5 rounded-full"
-                style={{ width: `${stats.averageScore}%` }}
-              ></div>
-            </div>
-          )}
         </div>
       </section>
 

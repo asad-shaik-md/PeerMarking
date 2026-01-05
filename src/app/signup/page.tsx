@@ -70,7 +70,6 @@ export default function SignupPage() {
                 onClick={() => setSelectedRole("student")}
                 className="group relative bg-surface-dark rounded-2xl p-8 border border-white/5 hover:border-primary/50 transition-all duration-300 shadow-none hover:shadow-glow flex flex-col h-full text-left"
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="material-symbols-outlined text-3xl text-blue-500">
                     menu_book
@@ -114,7 +113,6 @@ export default function SignupPage() {
                 onClick={() => setSelectedRole("marker")}
                 className="group relative bg-surface-dark rounded-2xl p-8 border border-white/5 hover:border-primary/50 transition-all duration-300 shadow-none hover:shadow-glow flex flex-col h-full text-left transform md:scale-105 md:-translate-y-2 z-10 ring-1 ring-primary/20"
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="absolute -top-3 -right-3 bg-primary text-background-dark text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-3">
                   POPULAR
                 </div>

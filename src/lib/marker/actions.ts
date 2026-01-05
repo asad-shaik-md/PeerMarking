@@ -192,7 +192,7 @@ export async function getSubmissionForReview(id: string): Promise<Submission | n
   return data as Submission;
 }
 
-// Submit a review (with marked file, feedback, and score)
+// Submit a review (with marked file and feedback)
 export async function submitReview(formData: FormData) {
   const supabase = await createClient();
 
@@ -206,7 +206,6 @@ export async function submitReview(formData: FormData) {
 
   const submissionId = formData.get("submissionId") as string;
   const markerNotes = formData.get("markerNotes") as string | null;
-  const score = formData.get("score") as string | null;
   const file = formData.get("markedFile") as File | null;
   const isDraft = formData.get("isDraft") === "true";
 
@@ -292,14 +291,6 @@ export async function submitReview(formData: FormData) {
   if (markedFilePath) {
     updateData.marked_file_path = markedFilePath;
     updateData.marked_file_name = markedFileName;
-  }
-
-  if (score !== null && score !== "") {
-    const scoreNum = parseInt(score, 10);
-    if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 100) {
-      return { error: "Score must be between 0 and 100" };
-    }
-    updateData.score = scoreNum;
   }
 
   // If not a draft, finalize the review

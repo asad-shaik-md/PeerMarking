@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUser, getUserRole, signOut } from "@/lib/auth/actions";
 import Link from "next/link";
+import StudentNav from "./StudentNav";
 
 export default async function StudentDashboardLayout({
   children,
@@ -19,6 +20,8 @@ export default async function StudentDashboardLayout({
     redirect("/marker/dashboard");
   }
 
+  const userName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Student";
+
   return (
     <div className="min-h-screen bg-background-dark">
       {/* Header */}
@@ -31,41 +34,13 @@ export default async function StudentDashboardLayout({
               </div>
               <span className="text-lg font-bold tracking-tight text-white">PeerMarking</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link
-                href="/student/dashboard"
-                className="text-sm font-medium text-white transition-colors"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/student/submissions"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                My Submissions
-              </Link>
-              <Link
-                href="/student/submissions/new"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Upload Answer
-              </Link>
-              <Link
-                href="/community"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Community
-              </Link>
-            </nav>
+            <StudentNav />
           </div>
           <div className="flex items-center gap-4">
-            <Link
-              href="/student/profile"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
+            <div className="flex items-center gap-2 text-sm text-gray-400">
               <span className="material-symbols-outlined text-[20px]">person</span>
-              <span className="hidden sm:inline">{user.email}</span>
-            </Link>
+              <span className="hidden sm:inline">{userName}</span>
+            </div>
             <form action={signOut}>
               <button
                 type="submit"

@@ -32,27 +32,12 @@ function getRelativeTime(dateString: string) {
   return "Just now";
 }
 
-function getStatusBadge(status: string, score?: number | null) {
-  if (status === "reviewed" && score !== null && score !== undefined) {
-    const passed = score >= 50;
+function getStatusBadge(status: string) {
+  if (status === "reviewed") {
     return (
-      <div
-        className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full backdrop-blur-sm ${
-          passed
-            ? "bg-primary/10 border border-primary/20"
-            : "bg-red-500/10 border border-red-500/20"
-        }`}
-      >
-        <span
-          className={`material-symbols-outlined text-[20px] ${
-            passed ? "text-primary" : "text-red-400"
-          }`}
-        >
-          {passed ? "check_circle" : "cancel"}
-        </span>
-        <span className={`font-bold text-lg ${passed ? "text-primary" : "text-red-400"}`}>
-          {passed ? "Pass" : "Needs Improvement"} ({score}%)
-        </span>
+      <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20">
+        <span className="material-symbols-outlined text-[20px] text-primary">check_circle</span>
+        <span className="font-bold text-lg text-primary">Reviewed</span>
       </div>
     );
   }
@@ -136,7 +121,7 @@ export default async function SubmissionDetailPage({
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0">{getStatusBadge(submission.status, submission.score)}</div>
+        <div className="flex-shrink-0">{getStatusBadge(submission.status)}</div>
       </section>
 
       {/* Additional Notes from Student */}
