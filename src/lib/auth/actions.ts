@@ -2,23 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { UserRole } from "@/types/auth";
 
-export async function signInWithGoogle(role?: UserRole) {
+export async function signInWithGoogle() {
   const supabase = await createClient();
-  
-  // Store role in a cookie for the callback to read (more reliable than URL params)
-  if (role) {
-    const cookieStore = await cookies();
-    cookieStore.set("oauth_signup_role", role, {
-      path: "/",
-      maxAge: 60 * 10, // 10 minutes
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
-  }
   
   const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
   
@@ -38,7 +24,6 @@ export async function signInWithGoogle(role?: UserRole) {
   }
 
   if (data.url) {
-    // Return the URL for client-side navigation (ensures cookie is set before redirect)
     return { url: data.url };
   }
 
@@ -59,8 +44,10 @@ export async function getUser() {
   return user;
 }
 
+export type UserRole = "student" | "marker";
+
 export async function getUserRole(): Promise<UserRole | null> {
   const user = await getUser();
   if (!user) return null;
-  return (user.user_metadata?.role as UserRole) || "student";
+  return (user.user_metadata?.role as UserRole) || null;
 }

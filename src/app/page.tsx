@@ -32,20 +32,12 @@ export default function LandingPage() {
               Testimonials
             </a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="hidden sm:flex items-center justify-center h-10 px-5 rounded-full text-sm font-bold text-white hover:bg-white/5 transition-colors"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="flex items-center justify-center h-10 px-6 rounded-full bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(56,224,123,0.3)]"
-            >
-              Sign Up
-            </Link>
-          </div>
+          <Link
+            href="/login"
+            className="flex items-center justify-center h-10 px-6 rounded-full bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(56,224,123,0.3)]"
+          >
+            Sign In
+          </Link>
         </div>
       </header>
 
@@ -70,14 +62,14 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-wrap gap-4 pt-2">
                 <Link
-                  href="/signup"
+                  href="/login"
                   className="h-12 px-8 rounded-full bg-primary text-background-dark text-base font-bold hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(56,224,123,0.4)] flex items-center gap-2"
                 >
                   <span className="material-symbols-outlined">upload_file</span>
                   Submit Practice Answer
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/login"
                   className="h-12 px-8 rounded-full border border-white/20 bg-transparent text-white text-base font-bold hover:bg-white/10 transition-colors flex items-center gap-2"
                 >
                   <span className="material-symbols-outlined">rate_review</span>
@@ -309,7 +301,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
-                href="/signup"
+                href="/login"
                 className="h-12 px-8 rounded-full bg-primary text-background-dark text-base font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
               >
                 Get Started for Free

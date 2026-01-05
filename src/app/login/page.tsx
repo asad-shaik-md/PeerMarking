@@ -36,10 +36,12 @@ function LoginForm() {
     <>
       <div className="mb-8 text-center">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-          <span className="material-symbols-outlined text-4xl text-primary">login</span>
+          <span className="material-symbols-outlined text-4xl text-primary">school</span>
         </div>
-        <h2 className="text-2xl font-bold text-white">Welcome Back</h2>
-        <p className="mt-2 text-sm text-text-muted">Sign in to continue to PeerMarking</p>
+        <h2 className="text-2xl font-bold text-white">Welcome to PeerMarking</h2>
+        <p className="mt-2 text-sm text-text-muted">
+          Sign in or create an account to get started
+        </p>
       </div>
 
       {error && (
@@ -81,23 +83,20 @@ function LoginForm() {
         {isGoogleLoading ? "Connecting..." : "Continue with Google"}
       </button>
 
+      {/* Info text */}
+      <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
+        <div className="flex items-start gap-3 text-sm text-slate-400">
+          <span className="material-symbols-outlined text-primary text-lg shrink-0 mt-0.5">info</span>
+          <span>
+            New users will be asked to select their role (Student or Marker) after signing in.
+          </span>
+        </div>
+      </div>
+
       {/* Security note */}
       <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
         <span className="material-symbols-outlined text-sm">lock</span>
         <span>Secure authentication powered by Google</span>
-      </div>
-
-      {/* Sign up link */}
-      <div className="mt-8 pt-6 border-t border-white/10">
-        <p className="text-center text-sm text-slate-400">
-          Don&apos;t have an account?{" "}
-          <Link
-            className="font-semibold text-primary hover:text-primary-dark transition-colors"
-            href="/signup"
-          >
-            Sign up
-          </Link>
-        </p>
       </div>
     </>
   );
