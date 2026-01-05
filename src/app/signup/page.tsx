@@ -2,29 +2,30 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { signUp } from "@/lib/auth/actions";
+import { signInWithGoogle } from "@/lib/auth/actions";
 import { UserRole } from "@/types/auth";
 
 export default function SignupPage() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  async function handleSubmit(formData: FormData) {
+  async function handleGoogleSignUp() {
     if (!selectedRole) {
-      setError("Please select a role");
+      setError("Please select a role first");
       return;
     }
 
-    setIsLoading(true);
+    setIsGoogleLoading(true);
     setError(null);
 
-    formData.append("role", selectedRole);
-    const result = await signUp(formData);
+    const result = await signInWithGoogle(selectedRole);
 
     if (result?.error) {
       setError(result.error);
-      setIsLoading(false);
+      setIsGoogleLoading(false);
+    } else if (result?.url) {
+      window.location.href = result.url;
     }
   }
 
@@ -174,7 +175,7 @@ export default function SignupPage() {
     );
   }
 
-  // Show signup form after role is selected
+  // Show Google signup after role is selected
   return (
     <div className="relative flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen">
       {/* Background decoration */}
@@ -184,18 +185,19 @@ export default function SignupPage() {
       </div>
 
       {/* Logo */}
-      <div className="relative z-10 mb-8 flex items-center gap-3">
+      <Link href="/" className="relative z-10 mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="bg-primary/20 p-2.5 rounded-xl shadow-glow">
           <span className="material-symbols-outlined text-primary text-3xl">school</span>
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-white">PeerMarking</h1>
-      </div>
+      </Link>
 
       {/* Signup Card */}
-      <div className="relative z-10 w-full max-w-[420px] bg-surface-dark rounded-2xl shadow-xl shadow-black/20 border border-white/5 overflow-hidden">
+      <div className="relative z-10 w-full max-w-[400px] bg-surface-dark rounded-2xl shadow-xl shadow-black/20 border border-white/5 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
 
         <div className="p-8 sm:p-10">
+          {/* Back button and role indicator */}
           <div className="mb-6">
             <button
               onClick={() => setSelectedRole(null)}
@@ -204,121 +206,89 @@ export default function SignupPage() {
               <span className="material-symbols-outlined text-base">arrow_back</span>
               Change role
             </button>
-            <div className="flex items-center gap-2 mb-2">
-              <span
-                className={`material-symbols-outlined text-2xl ${selectedRole === "marker" ? "text-primary" : "text-blue-500"}`}
-              >
-                {selectedRole === "marker" ? "history_edu" : "menu_book"}
-              </span>
-              <span className="text-sm font-medium text-slate-400">
-                Signing up as {selectedRole === "marker" ? "ACCA Senior (Marker)" : "ACCA Student"}
-              </span>
-            </div>
-            <h2 className="text-xl font-bold text-white">Create your account</h2>
           </div>
 
-          <form action={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-                {error}
-              </div>
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${selectedRole === "marker" ? "bg-primary/10" : "bg-blue-500/10"}`}>
+              <span className={`material-symbols-outlined text-4xl ${selectedRole === "marker" ? "text-primary" : "text-blue-500"}`}>
+                {selectedRole === "marker" ? "history_edu" : "menu_book"}
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold text-white">Create your account</h2>
+            <p className="mt-2 text-sm text-text-muted">
+              Signing up as {selectedRole === "marker" ? "ACCA Senior (Marker)" : "ACCA Student"}
+            </p>
+          </div>
+
+          {error && (
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-6 flex items-start gap-3">
+              <span className="material-symbols-outlined text-lg shrink-0">error</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Google Sign Up Button */}
+          <button
+            type="button"
+            onClick={handleGoogleSignUp}
+            disabled={isGoogleLoading}
+            className="w-full flex items-center justify-center gap-3 py-4 px-6 border border-white/10 rounded-xl text-base font-semibold text-white bg-white/5 hover:bg-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+          >
+            {isGoogleLoading ? (
+              <span className="material-symbols-outlined animate-spin text-[22px]">progress_activity</span>
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
             )}
+            {isGoogleLoading ? "Connecting..." : "Continue with Google"}
+          </button>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-300" htmlFor="fullName">
-                Full Name
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  person
-                </span>
-                <input
-                  className="block w-full rounded-xl border-white/10 bg-background-dark/50 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-400 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all"
-                  id="fullName"
-                  name="fullName"
-                  placeholder="Enter your full name"
-                  type="text"
-                  required
-                />
-              </div>
-            </div>
+          {/* Terms */}
+          <p className="mt-6 text-xs text-center text-slate-500">
+            By signing up, you agree to our{" "}
+            <a className="text-primary hover:underline" href="#">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a className="text-primary hover:underline" href="#">
+              Privacy Policy
+            </a>
+          </p>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-300" htmlFor="email">
-                Email Address
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  mail
-                </span>
-                <input
-                  className="block w-full rounded-xl border-white/10 bg-background-dark/50 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-400 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all"
-                  id="email"
-                  name="email"
-                  placeholder="you@example.com"
-                  type="email"
-                  required
-                />
-              </div>
-            </div>
+          {/* Security note */}
+          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
+            <span className="material-symbols-outlined text-sm">lock</span>
+            <span>Secure authentication powered by Google</span>
+          </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-300" htmlFor="password">
-                Password
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">
-                  lock
-                </span>
-                <input
-                  className="block w-full rounded-xl border-white/10 bg-background-dark/50 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-400 focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all"
-                  id="password"
-                  name="password"
-                  placeholder="Create a password (min. 6 characters)"
-                  type="password"
-                  minLength={6}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 pt-2">
-              <input
-                className="h-4 w-4 rounded border-white/20 text-primary bg-white/5 focus:ring-primary mt-0.5"
-                id="terms"
-                name="terms"
-                type="checkbox"
-                required
-              />
-              <label className="text-sm text-slate-400 select-none" htmlFor="terms">
-                I agree to the{" "}
-                <a className="text-primary hover:underline" href="#">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a className="text-primary hover:underline" href="#">
-                  Privacy Policy
-                </a>
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-glow text-sm font-bold text-background-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              {isLoading ? "Creating account..." : "Create account"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <span className="text-sm text-slate-400">Already have an account? </span>
-            <Link
-              className="text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
-              href="/login"
-            >
-              Sign in
-            </Link>
+          {/* Sign in link */}
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <p className="text-center text-sm text-slate-400">
+              Already have an account?{" "}
+              <Link
+                className="font-semibold text-primary hover:text-primary-dark transition-colors"
+                href="/login"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
       </div>

@@ -6,6 +6,16 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Handle OAuth code at root - redirect to auth callback
+  if (pathname === "/" && searchParams.has("code")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    // Preserve all query params (code, role, etc.)
+    return NextResponse.redirect(url);
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -34,8 +44,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
 
   // Pass pathname to server components via header for active state detection
   supabaseResponse.headers.set("x-pathname", pathname);
