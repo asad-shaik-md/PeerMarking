@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { signInWithGoogle } from "@/lib/auth/actions";
+import { useSearchParams, useRouter } from "next/navigation";
+import { signInWithGoogle, signInWithEmail } from "@/lib/auth/actions";
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // Check for error in URL params (e.g., from OAuth redirect)
   useEffect(() => {
@@ -21,6 +26,7 @@ function LoginForm() {
   async function handleGoogleSignIn() {
     setIsGoogleLoading(true);
     setError(null);
+    setSuccess(null);
 
     const result = await signInWithGoogle();
 
@@ -29,6 +35,37 @@ function LoginForm() {
       setIsGoogleLoading(false);
     } else if (result?.url) {
       window.location.href = result.url;
+    }
+  }
+
+  async function handleEmailSignIn(e: React.FormEvent) {
+    e.preventDefault();
+    setIsEmailLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    if (!email || !password) {
+      setError("Please enter your email and password");
+      setIsEmailLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setIsEmailLoading(false);
+      return;
+    }
+
+    const result = await signInWithEmail(email, password);
+
+    if (result?.error) {
+      setError(result.error);
+      setIsEmailLoading(false);
+    } else if (result?.confirmEmail) {
+      setSuccess("Check your email to confirm your account, then sign in again.");
+      setIsEmailLoading(false);
+    } else if (result?.redirect) {
+      router.push(result.redirect);
     }
   }
 
@@ -50,6 +87,72 @@ function LoginForm() {
           <span>{error}</span>
         </div>
       )}
+
+      {success && (
+        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm mb-6 flex items-start gap-3">
+          <span className="material-symbols-outlined text-lg shrink-0">check_circle</span>
+          <span>{success}</span>
+        </div>
+      )}
+
+      {/* Email/Password Form */}
+      <form onSubmit={handleEmailSignIn} className="space-y-4 mb-6">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+            disabled={isEmailLoading}
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+            disabled={isEmailLoading}
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isEmailLoading}
+          className="w-full py-4 px-6 rounded-xl text-base font-semibold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {isEmailLoading ? (
+            <>
+              <span className="material-symbols-outlined animate-spin text-[22px]">progress_activity</span>
+              Signing in...
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined text-[22px]">login</span>
+              Sign In with Email
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-white/10"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-4 bg-surface-dark text-slate-500">or continue with</span>
+        </div>
+      </div>
 
       {/* Google Sign In Button */}
       <button
@@ -96,7 +199,7 @@ function LoginForm() {
       {/* Security note */}
       <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
         <span className="material-symbols-outlined text-sm">lock</span>
-        <span>Secure authentication powered by Google</span>
+        <span>Secure authentication powered by Supabase</span>
       </div>
     </>
   );
