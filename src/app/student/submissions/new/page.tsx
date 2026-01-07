@@ -12,34 +12,64 @@ export default function UploadAnswerPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
-    }
-  };
-
-  const validateAndSetFile = (file: File) => {
+  const validateFile = (file: File): string | null => {
     const allowedTypes = [
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ];
     
     if (!allowedTypes.includes(file.type)) {
-      setError("Please upload a Word (.docx) or Excel (.xlsx) file only.");
-      return;
+      return `"${file.name}" is not a valid file type. Only Word (.docx) or Excel (.xlsx) files are allowed.`;
     }
     
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB.");
-      return;
+      return `"${file.name}" is too large. File size must be less than 10MB.`;
     }
     
-    setError(null);
-    setSelectedFile(file);
+    return null;
+  };
+
+  const addFiles = (newFiles: FileList | File[]) => {
+    const filesToAdd: File[] = [];
+    const errors: string[] = [];
+    
+    Array.from(newFiles).forEach(file => {
+      // Check for duplicates
+      if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        return; // Skip duplicates silently
+      }
+      
+      const validationError = validateFile(file);
+      if (validationError) {
+        errors.push(validationError);
+      } else {
+        filesToAdd.push(file);
+      }
+    });
+    
+    if (errors.length > 0) {
+      setError(errors[0]); // Show first error
+    } else {
+      setError(null);
+    }
+    
+    if (filesToAdd.length > 0) {
+      setSelectedFiles(prev => [...prev, ...filesToAdd]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      addFiles(files);
+    }
+    // Reset input so same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -56,17 +86,17 @@ export default function UploadAnswerPage() {
     e.preventDefault();
     setIsDragOver(false);
     
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      addFiles(files);
     }
-  }, []);
+  }, [selectedFiles]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!selectedFile) {
-      setError("Please select a file to upload.");
+    if (selectedFiles.length === 0) {
+      setError("Please select at least one file to upload.");
       return;
     }
     
@@ -74,7 +104,11 @@ export default function UploadAnswerPage() {
     setError(null);
     
     const formData = new FormData(e.currentTarget);
-    formData.set("file", selectedFile);
+    // Add all files to formData
+    selectedFiles.forEach((file, index) => {
+      formData.append(`file_${index}`, file);
+    });
+    formData.set("fileCount", selectedFiles.length.toString());
     
     try {
       const result = await createSubmission(formData);
@@ -98,8 +132,12 @@ export default function UploadAnswerPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const removeFile = () => {
-    setSelectedFile(null);
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const clearAllFiles = () => {
+    setSelectedFiles([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -197,9 +235,51 @@ export default function UploadAnswerPage() {
 
           {/* File Upload */}
           <div className="flex flex-col gap-3">
-            <label className="text-sm font-semibold tracking-wide uppercase text-gray-400 pl-1">
-              File Upload
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-semibold tracking-wide uppercase text-gray-400 pl-1">
+                File Upload {selectedFiles.length > 0 && `(${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''})`}
+              </label>
+              {selectedFiles.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearAllFiles}
+                  className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+            
+            {/* Selected Files List */}
+            {selectedFiles.length > 0 && (
+              <div className="space-y-2 mb-2">
+                {selectedFiles.map((file, index) => (
+                  <div 
+                    key={`${file.name}-${index}`}
+                    className="flex items-center justify-between bg-primary/5 border border-primary/20 rounded-xl p-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/20 p-2 rounded-full text-primary">
+                        <span className="material-symbols-outlined text-xl">description</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-white text-sm">{file.name}</p>
+                        <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-full transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-xl">close</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Drop Zone / Add More Button */}
             <div 
               className={`relative group cursor-pointer transition-all duration-300 ${
                 isDragOver ? "scale-[1.01]" : ""
@@ -213,62 +293,53 @@ export default function UploadAnswerPage() {
                 type="file"
                 name="file"
                 accept=".docx,.xlsx"
+                multiple
                 onChange={handleFileChange}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
               
-              {selectedFile ? (
-                <div className="flex items-center justify-between w-full h-32 rounded-xl border-2 border-primary bg-primary/5 p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/20 p-3 rounded-full text-primary">
-                      <span className="material-symbols-outlined text-3xl">description</span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">{selectedFile.name}</p>
-                      <p className="text-sm text-gray-400">{formatFileSize(selectedFile.size)}</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFile();
-                    }}
-                    className="relative z-20 p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-full transition-colors"
-                  >
-                    <span className="material-symbols-outlined">close</span>
-                  </button>
+              <div 
+                className={`flex flex-col items-center justify-center w-full rounded-xl border-2 border-dashed transition-all duration-300 ${
+                  selectedFiles.length > 0 ? "h-24 py-4" : "h-64"
+                } ${
+                  isDragOver 
+                    ? "border-primary bg-primary/10" 
+                    : "border-white/20 bg-surface-dark group-hover:bg-primary/5 group-hover:border-primary"
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center text-center px-4">
+                  {selectedFiles.length > 0 ? (
+                    <>
+                      <div className="flex items-center gap-2 text-primary">
+                        <span className="material-symbols-outlined text-2xl">add_circle</span>
+                        <span className="font-medium">Add more files</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">Click or drag files here</p>
+                    </>
+                  ) : (
+                    <>
+                      <div 
+                        className={`bg-white/5 p-4 rounded-full mb-4 transition-all duration-300 ${
+                          isDragOver 
+                            ? "text-primary scale-110" 
+                            : "text-gray-400 group-hover:text-primary group-hover:scale-110"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-4xl">cloud_upload</span>
+                      </div>
+                      <p className="mb-2 text-lg font-medium text-white">
+                        <span className="font-bold text-primary hover:underline">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Word (.docx) or Excel (.xlsx) files only
+                      </p>
+                      <p className="mt-4 text-xs font-semibold text-gray-500">
+                        Maximum 10MB per file • Multiple files allowed
+                      </p>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <div 
-                  className={`flex flex-col items-center justify-center w-full h-64 rounded-xl border-2 border-dashed transition-all duration-300 ${
-                    isDragOver 
-                      ? "border-primary bg-primary/10" 
-                      : "border-white/20 bg-surface-dark group-hover:bg-primary/5 group-hover:border-primary"
-                  }`}
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                    <div 
-                      className={`bg-white/5 p-4 rounded-full mb-4 transition-all duration-300 ${
-                        isDragOver 
-                          ? "text-primary scale-110" 
-                          : "text-gray-400 group-hover:text-primary group-hover:scale-110"
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-4xl">cloud_upload</span>
-                    </div>
-                    <p className="mb-2 text-lg font-medium text-white">
-                      <span className="font-bold text-primary hover:underline">Click to upload</span> or drag and drop
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Word (.docx) or Excel (.xlsx) files only
-                    </p>
-                    <p className="mt-4 text-xs font-semibold text-gray-500">
-                      Maximum file size: 10MB
-                    </p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
 
@@ -321,7 +392,7 @@ export default function UploadAnswerPage() {
             </Link>
             <button
               type="submit"
-              disabled={isSubmitting || !selectedFile}
+              disabled={isSubmitting || selectedFiles.length === 0}
               className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:bg-primary/50 disabled:cursor-not-allowed text-background-dark font-bold text-base py-3 px-8 rounded-full transition-all active:scale-95 shadow-[0_0_20px_rgba(56,224,123,0.3)]"
             >
               {isSubmitting ? (

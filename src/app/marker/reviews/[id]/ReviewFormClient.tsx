@@ -6,10 +6,16 @@ import { Submission } from "@/types/submission";
 import { getPaperLabel } from "@/types/submission";
 import { submitReview } from "@/lib/marker/actions";
 
+interface FileWithUrl {
+  name: string;
+  url: string;
+  size: number;
+}
+
 interface ReviewFormClientProps {
   submission: Submission;
-  originalDownloadUrl: string | null;
-  markedDownloadUrl: string | null;
+  originalFiles: FileWithUrl[];
+  markedFilesFromServer: FileWithUrl[];
 }
 
 function formatDate(dateString: string) {
@@ -41,14 +47,14 @@ function getRelativeTime(dateString: string) {
 
 export default function ReviewFormClient({
   submission,
-  originalDownloadUrl,
-  markedDownloadUrl,
+  originalFiles,
+  markedFilesFromServer,
 }: ReviewFormClientProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
   const [isDraftPending, startDraftTransition] = useTransition();
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -56,14 +62,7 @@ export default function ReviewFormClient({
 
   const isReviewed = submission.status === "reviewed";
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
-    }
-  };
-
-  const validateAndSetFile = (file: File) => {
+  const validateFile = (file: File): string | null => {
     const allowedTypes = [
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -71,17 +70,54 @@ export default function ReviewFormClient({
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setError("Please upload a Word (.docx), Excel (.xlsx), or PDF file.");
-      return;
+      return `"${file.name}" is not valid. Only Word, Excel, or PDF files allowed.`;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB.");
-      return;
+      return `"${file.name}" is too large. Maximum size is 10MB.`;
     }
 
-    setError(null);
-    setSelectedFile(file);
+    return null;
+  };
+
+  const addFiles = (newFiles: FileList | File[]) => {
+    const filesToAdd: File[] = [];
+    const errors: string[] = [];
+    
+    Array.from(newFiles).forEach(file => {
+      // Check for duplicates
+      if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+        return; // Skip duplicates silently
+      }
+      
+      const validationError = validateFile(file);
+      if (validationError) {
+        errors.push(validationError);
+      } else {
+        filesToAdd.push(file);
+      }
+    });
+    
+    if (errors.length > 0) {
+      setError(errors[0]);
+    } else {
+      setError(null);
+    }
+    
+    if (filesToAdd.length > 0) {
+      setSelectedFiles(prev => [...prev, ...filesToAdd]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      addFiles(files);
+    }
+    // Reset input so same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -98,14 +134,18 @@ export default function ReviewFormClient({
     e.preventDefault();
     setIsDragOver(false);
 
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      validateAndSetFile(file);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      addFiles(files);
     }
   };
 
-  const removeFile = () => {
-    setSelectedFile(null);
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const clearAllFiles = () => {
+    setSelectedFiles([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -119,10 +159,11 @@ export default function ReviewFormClient({
     formData.set("submissionId", submission.id);
     formData.set("markerNotes", markerNotes);
     formData.set("isDraft", isDraft.toString());
+    formData.set("markedFileCount", selectedFiles.length.toString());
 
-    if (selectedFile) {
-      formData.set("markedFile", selectedFile);
-    }
+    selectedFiles.forEach((file, index) => {
+      formData.append(`markedFile_${index}`, file);
+    });
 
     const transitionFn = isDraft ? startDraftTransition : startTransition;
 
@@ -132,6 +173,7 @@ export default function ReviewFormClient({
         setError(result.error);
       } else if (isDraft) {
         setSuccess("Draft saved successfully!");
+        setSelectedFiles([]); // Clear selected files after save
       }
       // If not draft, submitReview redirects to /marker/reviews
     });
@@ -203,49 +245,60 @@ export default function ReviewFormClient({
 
       {/* File Download/Upload Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {/* Original File */}
+        {/* Original File(s) */}
         <div className="group relative bg-surface-dark border border-white/10 rounded-lg p-6 flex flex-col transition-all hover:border-gray-600">
           <div className="flex items-start justify-between mb-4">
             <div className="size-12 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
               <span className="material-symbols-outlined text-2xl">description</span>
             </div>
             <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
-              Student Submission
+              Student Submission {originalFiles.length > 1 ? `(${originalFiles.length} files)` : ""}
             </span>
           </div>
-          <h3 className="text-lg font-bold text-white mb-1 truncate">{submission.file_name}</h3>
-          <p className="text-sm text-gray-400 mb-8">
-            {submission.file_size ? formatFileSize(submission.file_size) : "Unknown size"} •
-            Uploaded {getRelativeTime(submission.created_at)}
-          </p>
-          <div className="mt-auto">
-            {originalDownloadUrl ? (
-              <a
-                href={originalDownloadUrl}
-                download={submission.file_name}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium py-3 px-6 rounded-full transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">download</span>
-                <span>Download Original</span>
-              </a>
-            ) : (
-              <button
-                disabled
-                className="w-full flex items-center justify-center gap-2 bg-white/5 text-gray-500 font-medium py-3 px-6 rounded-full cursor-not-allowed"
-              >
-                <span className="material-symbols-outlined text-[20px]">error</span>
-                <span>File Unavailable</span>
-              </button>
-            )}
-          </div>
+          
+          {originalFiles.length > 0 ? (
+            <>
+              <div className="flex-1 space-y-2 mb-4">
+                {originalFiles.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="material-symbols-outlined text-gray-400">draft</span>
+                      <div className="min-w-0">
+                        <p className="text-sm text-white truncate">{file.name}</p>
+                        <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                      </div>
+                    </div>
+                    <a
+                      href={file.url}
+                      download={file.name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                      title="Download"
+                    >
+                      <span className="material-symbols-outlined">download</span>
+                    </a>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400">
+                Uploaded {getRelativeTime(submission.created_at)}
+              </p>
+            </>
+          ) : (
+            <>
+              <h3 className="text-lg font-bold text-gray-500 mb-1">No files</h3>
+              <p className="text-sm text-gray-500 mb-8">
+                File unavailable
+              </p>
+            </>
+          )}
         </div>
 
-        {/* Upload Marked File */}
+        {/* Upload Marked File(s) */}
         <div
           className={`group relative rounded-lg p-6 flex flex-col transition-all ${
-            selectedFile || submission.marked_file_path
+            selectedFiles.length > 0 || markedFilesFromServer.length > 0
               ? "bg-surface-dark border border-primary/20 shadow-[0_0_20px_rgba(56,224,123,0.05)]"
               : "bg-surface-dark/50 border-2 border-dashed border-white/20 hover:border-primary"
           }`}
@@ -253,87 +306,119 @@ export default function ReviewFormClient({
           onDragLeave={!isReviewed ? handleDragLeave : undefined}
           onDrop={!isReviewed ? handleDrop : undefined}
         >
-          {selectedFile ? (
-            // New file selected
+          {selectedFiles.length > 0 ? (
+            // New files selected
             <>
               <div className="flex items-start justify-between mb-4">
                 <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                   <span className="material-symbols-outlined text-2xl">upload_file</span>
                 </div>
-                <span className="text-xs font-medium uppercase tracking-wider text-primary">
-                  New File
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium uppercase tracking-wider text-primary">
+                    {selectedFiles.length} New File{selectedFiles.length > 1 ? "s" : ""}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearAllFiles}
+                    className="text-xs text-red-400 hover:text-red-300"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-white mb-1 truncate">{selectedFile.name}</h3>
-              <p className="text-sm text-gray-400 mb-8">
-                {formatFileSize(selectedFile.size)} • Ready to upload
-              </p>
+              <div className="flex-1 space-y-2 mb-4">
+                {selectedFiles.map((file, index) => (
+                  <div key={`${file.name}-${index}`} className="flex items-center justify-between p-2 bg-primary/5 rounded-lg">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="material-symbols-outlined text-primary text-lg">draft</span>
+                      <span className="text-sm text-white truncate">{file.name}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="p-1 text-gray-400 hover:text-red-400 rounded transition-colors shrink-0"
+                    >
+                      <span className="material-symbols-outlined text-lg">close</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
               <div className="mt-auto">
-                <button
-                  type="button"
-                  onClick={removeFile}
-                  className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium py-3 px-6 rounded-full transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[20px]">close</span>
-                  <span>Remove File</span>
-                </button>
+                <label className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium py-3 px-6 rounded-full transition-colors cursor-pointer">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".docx,.xlsx,.pdf"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <span className="material-symbols-outlined text-[20px]">add</span>
+                  <span>Add More Files</span>
+                </label>
               </div>
             </>
-          ) : submission.marked_file_path ? (
-            // Existing marked file
+          ) : markedFilesFromServer.length > 0 ? (
+            // Existing marked file(s)
             <>
               <div className="flex items-start justify-between mb-4">
                 <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                   <span className="material-symbols-outlined text-2xl">rate_review</span>
                 </div>
                 <span className="text-xs font-medium uppercase tracking-wider text-primary">
-                  Marked File
+                  Marked File{markedFilesFromServer.length > 1 ? "s" : ""}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-white mb-1 truncate">
-                {submission.marked_file_name}
-              </h3>
-              <p className="text-sm text-gray-400 mb-8">
-                Uploaded{" "}
-                {submission.reviewed_at
-                  ? getRelativeTime(submission.reviewed_at)
-                  : getRelativeTime(submission.updated_at)}
-              </p>
-              <div className="mt-auto space-y-2">
-                {markedDownloadUrl && (
-                  <a
-                    href={markedDownloadUrl}
-                    download={submission.marked_file_name}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-full transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">download</span>
-                    <span>Download Marked File</span>
-                  </a>
-                )}
+              
+              <div className="flex-1 space-y-2 mb-4">
+                {markedFilesFromServer.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="material-symbols-outlined text-primary">draft</span>
+                      <div className="min-w-0">
+                        <p className="text-sm text-white truncate">{file.name}</p>
+                        {file.size > 0 && <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>}
+                      </div>
+                    </div>
+                    <a
+                      href={file.url}
+                      download={file.name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 p-2 text-primary hover:bg-primary/20 rounded-full transition-colors"
+                      title="Download"
+                    >
+                      <span className="material-symbols-outlined">download</span>
+                    </a>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-auto">
                 {!isReviewed && (
                   <label className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium py-3 px-6 rounded-full transition-colors cursor-pointer">
                     <input
                       ref={fileInputRef}
                       type="file"
                       accept=".docx,.xlsx,.pdf"
+                      multiple
                       onChange={handleFileChange}
                       className="hidden"
                     />
                     <span className="material-symbols-outlined text-[20px]">upload</span>
-                    <span>Replace File</span>
+                    <span>Replace Files</span>
                   </label>
                 )}
               </div>
             </>
           ) : (
-            // Upload new file
+            // Upload new file(s)
             <>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept=".docx,.xlsx,.pdf"
+                multiple
                 onChange={handleFileChange}
                 className="hidden"
                 id="markedFile"
@@ -352,13 +437,13 @@ export default function ReviewFormClient({
                 >
                   <span className="material-symbols-outlined text-3xl">cloud_upload</span>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-1">Upload Marked File</h3>
+                <h3 className="text-lg font-bold text-white mb-1">Upload Marked Files</h3>
                 <p className="text-sm text-gray-400 mb-6 max-w-[200px] leading-snug text-center">
-                  Drag & drop your marked PDF or DOCX here
+                  Drag & drop your marked files here (PDF, DOCX, XLSX)
                 </p>
                 <span className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-8 rounded-full transition-colors shadow-lg shadow-primary/20">
                   <span className="material-symbols-outlined text-[20px]">upload_file</span>
-                  <span>Select File</span>
+                  <span>Select Files</span>
                 </span>
               </label>
             </>

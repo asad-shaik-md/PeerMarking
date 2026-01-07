@@ -10,6 +10,15 @@ export default function StudentNav() {
     if (href === "/student/dashboard") {
       return pathname === "/student/dashboard" || pathname === "/student";
     }
+    // For submissions list, only match exact path or individual submission pages (not /new)
+    if (href === "/student/submissions") {
+      return pathname === "/student/submissions" || 
+        (pathname.startsWith("/student/submissions/") && !pathname.startsWith("/student/submissions/new"));
+    }
+    // For upload page, match exact path
+    if (href === "/student/submissions/new") {
+      return pathname === "/student/submissions/new";
+    }
     return pathname.startsWith(href);
   };
 

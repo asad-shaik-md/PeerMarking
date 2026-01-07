@@ -1,5 +1,12 @@
 export type SubmissionStatus = "pending" | "under_review" | "reviewed";
 
+export interface SubmissionFile {
+  path: string;
+  name: string;
+  size: number;
+  original_name: string; // Original filename before renaming
+}
+
 export interface Submission {
   id: string;
   user_id: string;
@@ -7,11 +14,15 @@ export interface Submission {
   paper: string;
   question?: string;
   notes?: string;
+  // Legacy single file fields (kept for backward compatibility)
   file_path: string;
   file_name: string;
   file_size: number;
   marked_file_path?: string;
   marked_file_name?: string;
+  // New multiple files support
+  files?: SubmissionFile[];
+  marked_files?: SubmissionFile[];
   status: SubmissionStatus;
   score?: number;
   marker_notes?: string;

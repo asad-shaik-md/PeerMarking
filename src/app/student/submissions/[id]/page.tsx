@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSubmission, getFileDownloadUrl } from "@/lib/submissions/actions";
+import { getSubmission, getAllFileDownloadUrls } from "@/lib/submissions/actions";
 import { getPaperLabel } from "@/types/submission";
 
 function formatDate(dateString: string) {
@@ -73,11 +73,8 @@ export default async function SubmissionDetailPage({
     notFound();
   }
 
-  // Get download URLs with ownership verification
-  const originalDownloadUrl = await getFileDownloadUrl(submission.file_path, submission.id);
-  const markedDownloadUrl = submission.marked_file_path
-    ? await getFileDownloadUrl(submission.marked_file_path, submission.id)
-    : null;
+  // Get download URLs for all files
+  const { originalFiles, markedFiles } = await getAllFileDownloadUrls(submission.id);
 
   return (
     <div className="w-full max-w-[1000px] mx-auto">
@@ -137,49 +134,60 @@ export default async function SubmissionDetailPage({
 
       {/* File Download Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {/* Original File */}
+        {/* Original Files */}
         <div className="group relative bg-surface-dark border border-white/10 rounded-lg p-6 flex flex-col transition-all hover:border-gray-600">
           <div className="flex items-start justify-between mb-4">
             <div className="size-12 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
               <span className="material-symbols-outlined text-2xl">description</span>
             </div>
             <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
-              Original
+              Original {originalFiles.length > 1 ? `(${originalFiles.length} files)` : ""}
             </span>
           </div>
-          <h3 className="text-lg font-bold text-white mb-1 truncate">{submission.file_name}</h3>
-          <p className="text-sm text-gray-400 mb-8">
-            {submission.file_size ? formatFileSize(submission.file_size) : "Unknown size"} •
-            Uploaded {getRelativeTime(submission.created_at)}
-          </p>
-          <div className="mt-auto">
-            {originalDownloadUrl.url ? (
-              <a
-                href={originalDownloadUrl.url}
-                download={submission.file_name}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-medium py-3 px-6 rounded-full transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">download</span>
-                <span>Download Original</span>
-              </a>
-            ) : (
-              <button
-                disabled
-                className="w-full flex items-center justify-center gap-2 bg-white/5 text-gray-500 font-medium py-3 px-6 rounded-full cursor-not-allowed"
-              >
-                <span className="material-symbols-outlined text-[20px]">error</span>
-                <span>File Unavailable</span>
-              </button>
-            )}
-          </div>
+          
+          {originalFiles.length > 0 ? (
+            <>
+              <div className="flex-1 space-y-2 mb-4">
+                {originalFiles.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="material-symbols-outlined text-gray-400">draft</span>
+                      <div className="min-w-0">
+                        <p className="text-sm text-white truncate">{file.name}</p>
+                        <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                      </div>
+                    </div>
+                    <a
+                      href={file.url}
+                      download={file.name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                      title="Download"
+                    >
+                      <span className="material-symbols-outlined">download</span>
+                    </a>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mb-4">
+                Uploaded {getRelativeTime(submission.created_at)}
+              </p>
+            </>
+          ) : (
+            <>
+              <h3 className="text-lg font-bold text-gray-500 mb-1">No files</h3>
+              <p className="text-sm text-gray-500 mb-8">
+                File unavailable
+              </p>
+            </>
+          )}
         </div>
 
-        {/* Marked File */}
+        {/* Marked Files */}
         <div
           className={`group relative bg-surface-dark rounded-lg p-6 flex flex-col ${
-            submission.marked_file_path
+            markedFiles.length > 0
               ? "border border-primary/20 shadow-[0_0_20px_rgba(56,224,123,0.05)]"
               : "border border-white/10 border-dashed"
           }`}
@@ -187,7 +195,7 @@ export default async function SubmissionDetailPage({
           <div className="flex items-start justify-between mb-4">
             <div
               className={`size-12 rounded-full flex items-center justify-center ${
-                submission.marked_file_path
+                markedFiles.length > 0
                   ? "bg-primary/10 text-primary"
                   : "bg-white/5 text-gray-500"
               }`}
@@ -196,46 +204,41 @@ export default async function SubmissionDetailPage({
             </div>
             <span
               className={`text-xs font-medium uppercase tracking-wider ${
-                submission.marked_file_path ? "text-primary" : "text-gray-500"
+                markedFiles.length > 0 ? "text-primary" : "text-gray-500"
               }`}
             >
-              Marked
+              Marked {markedFiles.length > 1 ? `(${markedFiles.length} files)` : ""}
             </span>
           </div>
 
-          {submission.marked_file_path && submission.marked_file_name ? (
+          {markedFiles.length > 0 ? (
             <>
-              <h3 className="text-lg font-bold text-white mb-1 truncate">
-                {submission.marked_file_name}
-              </h3>
-              <p className="text-sm text-gray-400 mb-8">
-                Reviewed{" "}
-                {submission.reviewed_at
-                  ? getRelativeTime(submission.reviewed_at)
-                  : "recently"}
-              </p>
-              <div className="mt-auto">
-                {markedDownloadUrl?.url ? (
-                  <a
-                    href={markedDownloadUrl.url}
-                    download={submission.marked_file_name}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-full transition-colors shadow-lg shadow-primary/20"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">download</span>
-                    <span>Download Marked File</span>
-                  </a>
-                ) : (
-                  <button
-                    disabled
-                    className="w-full flex items-center justify-center gap-2 bg-white/5 text-gray-500 font-medium py-3 px-6 rounded-full cursor-not-allowed"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">error</span>
-                    <span>File Unavailable</span>
-                  </button>
-                )}
+              <div className="flex-1 space-y-2 mb-4">
+                {markedFiles.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="material-symbols-outlined text-primary">draft</span>
+                      <div className="min-w-0">
+                        <p className="text-sm text-white truncate">{file.name}</p>
+                        {file.size > 0 && <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>}
+                      </div>
+                    </div>
+                    <a
+                      href={file.url}
+                      download={file.name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 p-2 text-primary hover:bg-primary/20 rounded-full transition-colors"
+                      title="Download"
+                    >
+                      <span className="material-symbols-outlined">download</span>
+                    </a>
+                  </div>
+                ))}
               </div>
+              <p className="text-xs text-gray-500">
+                Reviewed {submission.reviewed_at ? getRelativeTime(submission.reviewed_at) : "recently"}
+              </p>
             </>
           ) : (
             <>

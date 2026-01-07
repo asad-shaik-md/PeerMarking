@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSubmissionForReview, getMarkerFileDownloadUrl } from "@/lib/marker/actions";
+import { getSubmissionForReview, getMarkerAllFileDownloadUrls } from "@/lib/marker/actions";
 import ReviewFormClient from "./ReviewFormClient";
 
 export default async function MarkerReviewDetailPage({
@@ -14,17 +14,14 @@ export default async function MarkerReviewDetailPage({
     notFound();
   }
 
-  // Get download URLs with assignment verification
-  const originalDownload = await getMarkerFileDownloadUrl(submission.file_path, submission.id);
-  const markedDownload = submission.marked_file_path
-    ? await getMarkerFileDownloadUrl(submission.marked_file_path, submission.id)
-    : null;
+  // Get download URLs for all files
+  const { originalFiles, markedFiles } = await getMarkerAllFileDownloadUrls(submission.id);
 
   return (
     <ReviewFormClient
       submission={submission}
-      originalDownloadUrl={originalDownload.url}
-      markedDownloadUrl={markedDownload?.url || null}
+      originalFiles={originalFiles}
+      markedFilesFromServer={markedFiles}
     />
   );
 }
