@@ -1,43 +1,27 @@
 import Link from "next/link";
+import LandingNav from "./LandingNav";
 
 export default function LandingPage() {
   return (
     <div className="relative flex min-h-screen flex-col">
       {/* Navigation */}
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background-dark/80 backdrop-blur-md">
-        <div className="flex h-16 items-center justify-between px-6 lg:px-20 max-w-[1440px] mx-auto w-full">
+        <div className="flex h-16 items-center justify-between px-4 md:px-6 lg:px-20 max-w-[1440px] mx-auto w-full">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center size-8 rounded-full bg-primary text-background-dark">
               <span className="material-symbols-outlined text-[20px]">school</span>
             </div>
             <span className="text-lg font-bold tracking-tight text-white">PeerMarking</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a
-              className="text-sm font-medium text-gray-300 hover:text-primary transition-colors"
-              href="#how-it-works"
+          <div className="flex items-center gap-4">
+            <LandingNav />
+            <Link
+              href="/login"
+              className="hidden md:flex items-center justify-center h-10 px-6 rounded-full bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(56,224,123,0.3)]"
             >
-              How it works
-            </a>
-            <a
-              className="text-sm font-medium text-gray-300 hover:text-primary transition-colors"
-              href="#features"
-            >
-              Features
-            </a>
-            <a
-              className="text-sm font-medium text-gray-300 hover:text-primary transition-colors"
-              href="#testimonials"
-            >
-              Testimonials
-            </a>
-          </nav>
-          <Link
-            href="/login"
-            className="flex items-center justify-center h-10 px-6 rounded-full bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(56,224,123,0.3)]"
-          >
-            Sign In
-          </Link>
+              Sign In
+            </Link>
+          </div>
         </div>
       </header>
 

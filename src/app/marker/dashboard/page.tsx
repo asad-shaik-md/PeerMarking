@@ -107,13 +107,14 @@ export default async function MarkerDashboard() {
 
       {/* Assigned to Me Section */}
       <section className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 className="text-xl font-bold text-white">Assigned to Me</h3>
           <Link
             href="/marker/queue"
-            className="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-full inline-flex items-center gap-2 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 transform hover:-translate-y-0.5"
+            className="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-5 md:px-6 rounded-full inline-flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 transform hover:-translate-y-0.5 text-sm md:text-base"
           >
-            Submissions to Review
+            <span className="hidden sm:inline">Submissions to Review</span>
+            <span className="sm:hidden">Review Queue</span>
           </Link>
         </div>
 
@@ -136,7 +137,41 @@ export default async function MarkerDashboard() {
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y divide-white/5">
+              {recentReviews.map((review) => (
+                <Link
+                  key={review.id}
+                  href={`/marker/reviews/${review.id}`}
+                  className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${getPaperBgColor(review.paper)}`}
+                  >
+                    {review.paper}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-white truncate">
+                      ACCA {review.paper}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {review.question || review.title}
+                    </p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs text-gray-500">{formatDate(review.created_at)}</span>
+                      {getStatusBadge(review.status)}
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined text-gray-400">
+                    chevron_right
+                  </span>
+                </Link>
+              ))}
+            </div>
+            
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-white/5 border-b border-white/5">
@@ -196,6 +231,7 @@ export default async function MarkerDashboard() {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </div>
 
