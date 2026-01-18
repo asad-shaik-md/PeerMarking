@@ -43,9 +43,11 @@ export default function ForgotPasswordPage() {
       {/* Logo */}
       <Link href="/" className="relative z-10 mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="bg-primary/20 p-2.5 rounded-xl shadow-glow">
-          <span className="material-symbols-outlined text-primary text-3xl">school</span>
+          <img src="/logo.png" alt="Marklynx" className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">PeerMarking</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-white">
+          <span className="text-primary">Mark</span>lynx
+        </h1>
       </Link>
 
       {/* Card */}
@@ -133,7 +135,7 @@ export default function ForgotPasswordPage() {
       </div>
 
       <div className="mt-8 text-center text-xs text-slate-500 z-10">
-        © 2024 PeerMarking. Empowering ACCA Students.
+        © 2024 Marklynx. Empowering ACCA Students.
       </div>
     </div>
   );

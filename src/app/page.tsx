@@ -7,11 +7,11 @@ export default function LandingPage() {
       {/* Navigation */}
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background-dark/80 backdrop-blur-md">
         <div className="flex h-16 items-center justify-between px-4 md:px-6 lg:px-20 max-w-[1440px] mx-auto w-full">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-8 rounded-full bg-primary text-background-dark">
-              <span className="material-symbols-outlined text-[20px]">school</span>
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white">PeerMarking</span>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="Marklynx" className="size-8" />
+            <span className="text-lg font-bold tracking-tight text-white">
+              <span className="text-primary">Mark</span>lynx
+            </span>
           </div>
           <div className="flex items-center gap-4">
             <LandingNav />
@@ -260,7 +260,7 @@ export default function LandingPage() {
                 <span className="material-symbols-outlined text-[24px]">star</span>
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-white leading-snug">
-                &ldquo;I was failing PM consistently until I started using PeerMarking. The feedback
+                &ldquo;I was failing PM consistently until I started using Marklynx. The feedback
                 on my spreadsheet technique was a game changer. Passed with 68%!&rdquo;
               </h3>
               <div className="flex items-center gap-4">
@@ -300,10 +300,10 @@ export default function LandingPage() {
         <div className="max-w-[1440px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1 flex flex-col gap-4">
             <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center size-6 rounded-full bg-primary text-background-dark">
-                <span className="material-symbols-outlined text-[14px]">school</span>
-              </div>
-              <span className="text-base font-bold text-white">PeerMarking</span>
+              <img src="/logo.png" alt="Marklynx" className="size-6" />
+              <span className="text-base font-bold text-white">
+                <span className="text-primary">Mark</span>lynx
+              </span>
             </div>
             <p className="text-sm text-gray-400">
               The #1 peer marking community for ACCA students worldwide.
@@ -344,7 +344,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="max-w-[1440px] mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>© 2024 PeerMarking. All rights reserved.</p>
+          <p>© 2024 Marklynx. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -73,9 +73,9 @@ function LoginForm() {
     <>
       <div className="mb-8 text-center">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-          <span className="material-symbols-outlined text-4xl text-primary">school</span>
+          <img src="/logo.png" alt="Marklynx" className="w-10 h-10" />
         </div>
-        <h2 className="text-2xl font-bold text-white">Welcome to PeerMarking</h2>
+        <h2 className="text-2xl font-bold text-white">Welcome to <span className="text-primary">Mark</span>lynx</h2>
         <p className="mt-2 text-sm text-text-muted">
           Sign in or create an account to get started
         </p>
@@ -225,9 +225,11 @@ export default function LoginPage() {
       {/* Logo */}
       <Link href="/" className="relative z-10 mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div className="bg-primary/20 p-2.5 rounded-xl shadow-glow">
-          <span className="material-symbols-outlined text-primary text-3xl">school</span>
+          <img src="/logo.png" alt="Marklynx" className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">PeerMarking</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-white">
+          <span className="text-primary">Mark</span>lynx
+        </h1>
       </Link>
 
       {/* Login Card */}
@@ -242,7 +244,7 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 text-center text-xs text-slate-500 z-10">
-        © 2024 PeerMarking. Empowering ACCA Students.
+        © 2024 Marklynx. Empowering ACCA Students.
       </div>
     </div>
   );

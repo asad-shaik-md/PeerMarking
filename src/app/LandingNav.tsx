@@ -71,7 +71,12 @@ export default function LandingNav() {
         <div className="flex flex-col h-full">
           {/* Menu Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/10">
-            <span className="text-lg font-bold text-white">Menu</span>
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="Marklynx" className="size-6" />
+              <span className="text-lg font-bold text-white">
+                <span className="text-primary">Mark</span>lynx
+              </span>
+            </div>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2 text-gray-400 hover:text-white transition-colors"

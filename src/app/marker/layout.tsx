@@ -28,13 +28,13 @@ export default async function MarkerDashboardLayout({
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background-dark/80 backdrop-blur-md">
         <div className="flex h-16 items-center justify-between px-4 md:px-6 lg:px-10 max-w-[1440px] mx-auto w-full">
           <div className="flex items-center gap-4 md:gap-6">
-            <MarkerNav />
-            <Link href="/marker/dashboard" className="flex items-center gap-3">
-              <div className="flex items-center justify-center size-8 rounded-full bg-primary text-background-dark">
-                <span className="material-symbols-outlined text-[20px]">school</span>
-              </div>
-              <span className="text-lg font-bold tracking-tight text-white hidden sm:inline">PeerMarking</span>
+            <Link href="/marker/dashboard" className="flex items-center gap-2">
+              <img src="/logo.png" alt="Marklynx" className="size-8" />
+              <span className="text-lg font-bold tracking-tight text-white hidden sm:inline">
+                <span className="text-primary">Mark</span>lynx
+              </span>
             </Link>
+            <MarkerNav />
           </div>
           <div className="flex items-center gap-3 md:gap-4">
             <div className="flex items-center gap-2 text-sm text-gray-400">
