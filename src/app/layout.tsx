@@ -9,8 +9,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Marklynx - ACCA Peer Review Platform",
+  title: "Marklynx",
   description: "Upload your ACCA practice answers and get marked by qualified seniors. Sharp vision. Expert marking.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
