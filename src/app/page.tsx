@@ -30,10 +30,6 @@ export default function LandingPage() {
         <section className="relative px-6 py-16 md:py-24 lg:px-20">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             <div className="flex-1 flex flex-col gap-8 max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary w-fit">
-                <span className="material-symbols-outlined text-[16px]">verified</span>
-                Trusted by 5,000+ ACCA Students
-              </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-white">
                 Upload your <span className="text-primary">ACCA</span> practice answer.{" "}
                 <br className="hidden lg:block" />
@@ -246,36 +242,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Testimonial Section */}
-        <section id="testimonials" className="px-6 py-20 lg:px-20 mt-8 mb-20">
-          <div className="bg-gradient-to-r from-surface-dark to-background-dark border border-white/10 rounded-2xl p-8 md:p-12 relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 size-40 bg-primary/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 size-40 bg-blue-500/10 rounded-full blur-3xl"></div>
-            <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto gap-8">
-              <div className="flex text-primary gap-1">
-                <span className="material-symbols-outlined text-[24px]">star</span>
-                <span className="material-symbols-outlined text-[24px]">star</span>
-                <span className="material-symbols-outlined text-[24px]">star</span>
-                <span className="material-symbols-outlined text-[24px]">star</span>
-                <span className="material-symbols-outlined text-[24px]">star</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white leading-snug">
-                &ldquo;I was failing PM consistently until I started using Marklynx. The feedback
-                on my spreadsheet technique was a game changer. Passed with 68%!&rdquo;
-              </h3>
-              <div className="flex items-center gap-4">
-                <div className="size-12 rounded-full bg-gray-700 overflow-hidden flex items-center justify-center">
-                  <span className="material-symbols-outlined text-gray-400">person</span>
-                </div>
-                <div className="text-left">
-                  <div className="text-white font-bold">Sarah Jenkins</div>
-                  <div className="text-primary text-sm">ACCA Student, London</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Banner */}
         <section className="px-6 pb-24 lg:px-20 text-center">
           <div className="max-w-2xl mx-auto flex flex-col gap-6">
@@ -286,7 +252,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
                 href="/login"
-                className="h-12 px-8 rounded-full bg-primary text-background-dark text-base font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                className="h-12 px-8 rounded-full bg-primary text-background-dark text-base font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center"
               >
                 Get Started for Free
               </Link>
